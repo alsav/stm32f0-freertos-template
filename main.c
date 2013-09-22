@@ -1,19 +1,24 @@
 #include "main.h"
 
 static void GPIO_Config(void);
-void vLedTask (void *pvParameters);
+static void vLedTask (void *pvParameters);
 
 
 int main(void)
 {
-  GPIO_Config();
+    GPIO_Config();
+    USART_Config();
 
-  xTaskCreate(vLedTask,(signed char*) "LedTask", configMINIMAL_STACK_SIZE, (void *) NULL, tskIDLE_PRIORITY + 1, NULL);
-  vTaskStartScheduler();
+    USART_SendString("Hello");
+    USART_SendByte('!');
+    USART_SendString("\r\n");
+
+    xTaskCreate(vLedTask,(signed char*) "LedTask", configMINIMAL_STACK_SIZE, (void *) NULL, tskIDLE_PRIORITY + 2, NULL);
+    vTaskStartScheduler();
 
 }
 
-void vLedTask (void *pvParameters)
+static void vLedTask (void *pvParameters)
 {
     uint8_t state=0;
     while(1)    {
@@ -32,16 +37,16 @@ void vLedTask (void *pvParameters)
 
 void GPIO_Config(void)
 {
-	  GPIO_InitTypeDef GPIO_InitStruct;
+    GPIO_InitTypeDef GPIO_InitStruct;
 
-	  /*GPIOC config - LED Configuration*/
-	  RCC_AHBPeriphClockCmd( RCC_AHBPeriph_GPIOC, ENABLE );
-	  GPIO_InitStruct.GPIO_Pin =  GPIO_Pin_8 | GPIO_Pin_9;
-	  GPIO_InitStruct.GPIO_Mode = GPIO_Mode_OUT;
-	  GPIO_InitStruct.GPIO_Speed = GPIO_Speed_2MHz;
-	  GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
-	  GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_UP;
-	  GPIO_Init( GPIOC, &GPIO_InitStruct );
+    /*GPIOC config - LED Configuration*/
+    RCC_AHBPeriphClockCmd( RCC_AHBPeriph_GPIOC, ENABLE );
+    GPIO_InitStruct.GPIO_Pin =  GPIO_Pin_8 | GPIO_Pin_9;
+    GPIO_InitStruct.GPIO_Mode = GPIO_Mode_OUT;
+    GPIO_InitStruct.GPIO_Speed = GPIO_Speed_2MHz;
+    GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
+    GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_UP;
+    GPIO_Init( GPIOC, &GPIO_InitStruct );
 
 }
 
